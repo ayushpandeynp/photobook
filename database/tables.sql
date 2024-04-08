@@ -10,7 +10,7 @@ CREATE TABLE users (
     dob DATE NULL,
     hometown VARCHAR NULL,
     gender CHAR(1) NULL CHECK (gender IN ('M', 'F', 'O', NULL)),
-    password VARCHAR(50) NULL,
+    password VARCHAR(72) NULL,
     is_visitor BOOLEAN NOT NULL,
     
     CONSTRAINT chk_visitor CHECK (
