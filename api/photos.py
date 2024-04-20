@@ -70,3 +70,54 @@ def top_contributors():
         return returnMsg(True, 'Top contributors are returned', 200, {"contributors": contributors})
     except psycopg2.Error as e:
         return returnMsg(False, str(e), 400)
+    
+# You-may-also-like functionality (user scope)
+@app.route('/you-may-also-like', methods=['POST'])
+def you_may_also_like():
+    user_id = decode_token(request)
+
+    if user_id is None:
+        return returnMsg(False, 'Unauthorized', 401)
+
+    try:
+        cursor = conn.cursor()
+
+        # five most commonly used tags among the user's photos
+        cursor.execute("""
+            SELECT tag_name, COUNT(tag_name) as tag_count
+            FROM tags
+            WHERE photo_id IN (
+                SELECT photo_id FROM photos WHERE album_id IN (
+                    SELECT album_id FROM albums WHERE user_id = %s
+                )
+            )
+            GROUP BY tag_name
+            ORDER BY tag_count DESC
+            LIMIT 5
+        """, (user_id,))
+        user_tags = cursor.fetchall()
+        user_tags = [tag[0] for tag in user_tags]  # just the tag names
+
+        # get recommended photos
+        cursor.execute("""
+            SELECT P.photo_id, P.caption, P.path, P.album_id, COUNT(T.tag_name) as matched_tags
+            FROM photos P
+            INNER JOIN tags T ON P.photo_id = T.photo_id
+            WHERE T.tag_name IN %s
+            GROUP BY P.photo_id
+            ORDER BY matched_tags DESC, COUNT(T.tag_name) DESC
+            LIMIT 10
+        """, (tuple(user_tags),))
+        recommended_photos = cursor.fetchall()
+
+        # formatted result
+        formatted_photos = [{
+            "photo_id": photo[0],
+            "caption": photo[1],
+            "path": photo[2],
+            "album_id": photo[3]
+        } for photo in recommended_photos]
+
+        return returnMsg(True, 'Recommended photos are returned', 200, {"photos": formatted_photos})
+    except psycopg2.Error as e:
+        return returnMsg(False, str(e), 400)
