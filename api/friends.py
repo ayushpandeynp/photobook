@@ -32,7 +32,10 @@ def add_friend():
 def list_friends():
     data = request.json
     user_id = decode_token(request)
-
+    
+    if user_id is None:
+        return returnMsg(False, 'Unauthorized', 401)
+        
     try:   
         cursor = conn.cursor()
         cursor.execute("SELECT friend_id FROM friends WHERE user_id = %s", (user_id,))
