@@ -21,8 +21,18 @@ conn = psycopg2.connect(
     port=os.getenv("DB_PORT")
 )
 
+@app.before_request
+def only_json():
+    if not request.is_json:
+        return returnMsg(False, 'Only JSON body is allowed', 400)
+
+@app.route('/', methods=['GET'])
+def main():
+    return returnMsg(True, 'api service is up and running', 200)
+
 from friends import *
 from login import *
+
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8080)
