@@ -32,6 +32,7 @@ def main():
 
 from friends import *
 from login import *
+from photos import *
 
     
 if __name__ == '__main__':
