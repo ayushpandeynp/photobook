@@ -5,7 +5,7 @@ import jwt
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import os
-from utils import returnMsg
+from utils import *
 
 load_dotenv()
 
@@ -87,14 +87,9 @@ def login():
 @app.route('/add-friend', methods=['POST'])
 def add_friend():
     data = request.json
-    token = request.headers.get('Authorization')
-    if not token:
-        return returnMsg(False, 'Missing  token', 401)
+    user_id = decode_token(request)
+
     try:
-  
-        decoded_token = jwt.decode(
-            token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        user_id = decoded_token['user_id']
         friend_id = data['friend_id']
         
         cursor = conn.cursor()
@@ -103,38 +98,11 @@ def add_friend():
         conn.commit()
         
         return returnMsg(True, 'Friend Added Successfully', 201)
+    
     # not legitimate error
-    except (jwt.DecodeError, jwt.ExpiredSignatureError, psycopg2.Error) as e:
+    except psycopg2.Error as e:
         conn.rollback()
         return returnMsg(False, str(e), 400)
-
-@app.route('/list-friends', method=['GET'])
-def list_friends():
-    token = request.header.get('Authorizaton')
-    if not token:
-        return returnMsg(False, 'Missing  token', 401)
     
-    decoded_token = jwt.decode(
-            token, app.config['SECRET_KEY'], algorithms=['HS256'])
-    user_id = decoded_token['user_id']
-    
-    
-
-# SAMPLE AUTHENTICATED ROUTE
-@app.route('/decode', methods=['GET'])
-def decode_token():
-    token = request.headers.get('Authorization')
-    if not token:
-        return returnMsg(False, 'Missing token', 401)
-
-    try:
-        decoded_token = jwt.decode(
-            token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        user_id = decoded_token['user_id']
-
-        return returnMsg(True, 'Decoded successfully', 200, {'user_id': user_id})
-    except (jwt.DecodeError, jwt.ExpiredSignatureError):
-        return returnMsg(False, 'Invalid token', 401)
-
 if __name__ == '__main__':
     app.run(debug=True)
