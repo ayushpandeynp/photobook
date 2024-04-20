@@ -71,8 +71,9 @@ CREATE OR REPLACE FUNCTION check_legit_friend_relationship()
 RETURNS TRIGGER AS $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM users WHERE user_id = NEW.user_id AND is_visitor = FALSE) OR
-       NOT EXISTS (SELECT 1 FROM users WHERE user_id = NEW.friend_id AND is_visitor = FALSE) THEN
-        RAISE EXCEPTION 'Both users must be non-visitors';
+       NOT EXISTS (SELECT 1 FROM users WHERE user_id = NEW.friend_id AND is_visitor = FALSE) OR
+       NOT EXISTS (SELECT 1 WHERE NEW.user_id <> NEW.friend_id) THEN
+        RAISE EXCEPTION 'Both users must be non-visitors and not the same user.';
     END IF;
     RETURN NEW;
 END;
