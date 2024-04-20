@@ -49,8 +49,8 @@ FOR EACH ROW EXECUTE FUNCTION check_legit_user();
 CREATE TABLE photos (
     photo_id SERIAL PRIMARY KEY,
     album_id INT NOT NULL,
-    caption VARCHAR(100) NULL,
-    data BYTEA NOT NULL,
+    caption VARCHAR(250) NULL,
+    path TEXT NOT NULL,
     datetime TIMESTAMP NOT NULL,
     
     CONSTRAINT fk_album_id FOREIGN KEY (album_id) REFERENCES albums(album_id) ON DELETE CASCADE

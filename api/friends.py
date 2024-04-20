@@ -28,6 +28,35 @@ def add_friend():
         return returnMsg(False, str(e), 400)
     
 # search for users by name (user scope)
+@app.route('/list-friends', methods=['GET'])
+def list_friends():
+    data = request.json
+    user_id = decode_token(request)
+
+    try:   
+        cursor = conn.cursor()
+        cursor.execute("SELECT friend_id FROM friends WHERE user_id = %s", (user_id,))
+        results = cursor.fetchall()
+        
+        friend_list = []
+        for res in results:
+            friend_id = res[0] 
+            cursor.execute("SELECT fname, lname, email FROM users WHERE user_id = %s", (friend_id,))
+            friend_details = cursor.fetchone()
+            friend_list.append({
+                "fname": friend_details[0],
+                "lname": friend_details[1],
+                "email": friend_details[2]
+            })
+            
+        cursor.close()
+        return returnMsg(True, 'Friend list retrieved successfully', 200, {"friends": friend_list})
+
+    except psycopg2.Error as e:
+        return returnMsg(False, str(e), 400)
+
+    
+# search for users by name
 @app.route('/search-users', methods=['GET'])
 def search_friend():
     user_id = decode_token(request)
