@@ -57,3 +57,16 @@ def popular_tags():
         return returnMsg(True, 'Popular tags are returned', 200, {"tags": tags})
     except psycopg2.Error as e:
         return returnMsg(False, str(e), 400)
+    
+# Top 10 users who make the largest contribution (comments + photos count) (public)
+@app.route('/top-contributors', methods=['GET'])
+def top_contributors():
+    try:
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT U.user_id, U.fname, U.lname, COUNT(P.photo_id) + COUNT(C.comment_id) AS contribution FROM users U LEFT JOIN albums A ON U.user_id = A.user_id LEFT JOIN photos P ON A.album_id = P.album_id LEFT JOIN comments C ON U.user_id = C.user_id GROUP BY U.user_id ORDER BY contribution DESC LIMIT 10")
+        contributors = cursor.fetchall()
+        
+        return returnMsg(True, 'Top contributors are returned', 200, {"contributors": contributors})
+    except psycopg2.Error as e:
+        return returnMsg(False, str(e), 400)
