@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_bcrypt import Bcrypt
 import psycopg2
 import jwt
@@ -14,15 +14,14 @@ bcrypt = Bcrypt(app)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# DB CREDS
-DB_HOST = "localhost"  # Database host
-DB_NAME = "photobook"  # Database name
-DB_USER = ""  # Database username
-DB_PASS = ""  # Database password
-
-conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER,
-                        password=DB_PASS, host=DB_HOST)
-
+# DB CREDS from .env
+conn = psycopg2.connect(
+    dbname=os.getenv("DB_NAME"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASS"),
+    host=os.getenv("DB_HOST"),
+    port=os.getenv("DB_PORT")
+)
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -83,6 +82,43 @@ def login():
     except psycopg2.Error as e:
         conn.rollback()
         return returnMsg(False, str(e), 400)
+    
+# add friend (user scope)
+@app.route('/add-friend', methods=['POST'])
+def add_friend():
+    data = request.json
+    token = request.headers.get('Authorization')
+    if not token:
+        return returnMsg(False, 'Missing  token', 401)
+    try:
+  
+        decoded_token = jwt.decode(
+            token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = decoded_token['user_id']
+        friend_id = data['friend_id']
+        
+        cursor = conn.cursor()
+        cursor.execute("INSERT into friends (user_id, friend_id) VALUES(%s, %s)",
+                       (user_id,friend_id))
+        conn.commit()
+        
+        return returnMsg(True, 'Friend Added Successfully', 201)
+    # not legitimate error
+    except (jwt.DecodeError, jwt.ExpiredSignatureError, psycopg2.Error) as e:
+        conn.rollback()
+        return returnMsg(False, str(e), 400)
+
+@app.route('/list-friends', method=['GET'])
+def list_friends():
+    token = request.header.get('Authorizaton')
+    if not token:
+        return returnMsg(False, 'Missing  token', 401)
+    
+    decoded_token = jwt.decode(
+            token, app.config['SECRET_KEY'], algorithms=['HS256'])
+    user_id = decoded_token['user_id']
+    
+    
 
 # SAMPLE AUTHENTICATED ROUTE
 @app.route('/decode', methods=['GET'])
