@@ -27,7 +27,7 @@ def add_friend():
         conn.rollback()
         return returnMsg(False, str(e), 400)
     
-# search for users by name
+# search for users by name (user scope)
 @app.route('/search-users', methods=['GET'])
 def search_friend():
     user_id = decode_token(request)
