@@ -25,7 +25,7 @@ CREATE TABLE albums (
     album_id SERIAL PRIMARY KEY,
     album_name VARCHAR(50) NOT NULL,
     user_id INT NOT NULL,
-    datetime TIMESTAMP NOT NULL,
+    datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
@@ -51,7 +51,7 @@ CREATE TABLE photos (
     album_id INT NOT NULL,
     caption VARCHAR(250) NULL,
     path TEXT NOT NULL,
-    datetime TIMESTAMP NOT NULL,
+    datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_album_id FOREIGN KEY (album_id) REFERENCES albums(album_id) ON DELETE CASCADE
 );
@@ -97,7 +97,7 @@ CREATE TABLE comments (
     photo_id INT NOT NULL,
     user_id INT NOT NULL,
     text VARCHAR(100) NOT NULL,
-    datetime TIMESTAMP NOT NULL,
+    datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT fk_photo_id FOREIGN KEY (photo_id) REFERENCES photos(photo_id) ON DELETE CASCADE,
     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -107,7 +107,7 @@ CREATE TABLE comments (
 CREATE TABLE likes (
     photo_id INT NOT NULL,
     user_id INT NOT NULL,
-    datetime TIMESTAMP NOT NULL,
+    datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     
     CONSTRAINT pk_likes PRIMARY KEY (photo_id, user_id),
     CONSTRAINT fk_photo_id FOREIGN KEY (photo_id) REFERENCES photos(photo_id) ON DELETE CASCADE,
