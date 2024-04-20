@@ -57,3 +57,28 @@ def popular_tags():
         return returnMsg(True, 'Popular tags are returned', 200, {"tags": tags})
     except psycopg2.Error as e:
         return returnMsg(False, str(e), 400)
+    
+# create an album (user scope)
+@app.route('/create-album', methods=['POST'])
+def create_album():
+    data = request.json
+    user_id = decode_token(request)
+    if user_id is None:
+        return returnMsg(False, 'Unauthorized', 401)
+
+    try:
+        album_name = data['album_name']
+        
+        if not album_name:
+            return returnMsg(False, 'Album name is required', 400)
+
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO albums (album_name, user_id) VALUES (%s, %s)",
+                       (album_name, user_id))
+        conn.commit()
+        cursor.close()
+        
+        return returnMsg(True, 'Album created successfully', 200)
+        
+    except psycopg2.Error as e:
+        return returnMsg(False, str(e), 400)
