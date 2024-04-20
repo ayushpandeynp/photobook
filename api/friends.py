@@ -23,3 +23,21 @@ def add_friend():
     except psycopg2.Error as e:
         conn.rollback()
         return returnMsg(False, str(e), 400)
+    
+# list friends (user scope)
+@app.route('/list-friends', methods=['GET'])
+def list_friends():
+    data = request.json
+    user_id = decode_token(request)
+
+    try:   
+        cursor = conn.cursor()
+        cursor.execute("SELECT friend_id FROM friends WHERE user_id = %s", (user_id,))
+        results = cursor.fetchall()
+        
+        for res
+        cursor.close()
+        return returnMsg(True, 'Friend list retrieved successfully', 200, data=results)
+    
+    except psycopg2.Error as e:
+        return returnMsg(False, str(e), 400)
