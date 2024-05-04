@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Photo | Photobook</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div class="top-left-container">
+        <h3>Add Photo</h3>
+        <input type="text" name="photo-file" placeholder="Choose a file to upload">
+        <br>
+        <br>
+        <button type="submit">Submit</button> 
+    </div>   
+    </div>   
+  </body>
+</html>

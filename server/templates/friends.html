@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Friends | Photobook</title>
+    <script
+      src="https://kit.fontawesome.com/6e02521c5e.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div style="padding: 2rem">
+      <div
+        class="flex-horizontal"
+        style="justify-content: flex-start; align-items: flex-start; gap: 5rem;"
+      >
+        <div>
+          <h3>Search Friends</h3>
+          <input type="text" placeholder="" name="friend-search" />
+          <button>Search</button>
+
+          <br />
+          <br />
+
+          <h3>Results</h3>
+          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
+            <span>Ayush Pandey</span>
+            <div
+              style="font-size: 14px; gap: 1rem; cursor: pointer"
+              class="flex-horizontal"
+            >
+              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
+              <span>Add Friend</span>
+            </div>
+          </div>
+
+          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
+            <span>Ayush Pandey</span>
+            <div
+              style="font-size: 14px; gap: 1rem; cursor: pointer"
+              class="flex-horizontal"
+            >
+              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
+              <span>Add Friend</span>
+            </div>
+          </div>
+
+          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
+            <span>Ayush Pandey</span>
+            <div
+              style="font-size: 14px; gap: 1rem; cursor: pointer"
+              class="flex-horizontal"
+            >
+              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
+              <span>Add Friend</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Search Users by Comment</h3>
+          <input type="text" placeholder="" name="friend-search" />
+          <button>Search</button>
+
+          <br />
+          <br />
+
+          <h3>Results</h3>
+          <div class="gray-container p1">
+            ERIC ASARE ————— 5 Comments<br />
+            ERIC ASARE ————— 5 Comments<br />
+            ERIC ASARE ————— 5 Comments<br />
+            ERIC ASARE ————— 5 Comments
+          </div>
+        </div>
+
+        <div>
+          <h3>Your Friends</h3>
+          <div class="gray-container p1">
+            <ol type="1">
+              <li>ERIC ASARE</li>
+              <li>ERIC ASARE</li>
+              <li>ERIC ASARE</li>
+            </ol>
+          </div>
+
+          <br />
+          <br />
+
+          <h3>Recommended friends for you</h3>
+          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
+            <span>Ayush Pandey</span>
+            <div
+              style="font-size: 14px; gap: 1rem; cursor: pointer"
+              class="flex-horizontal"
+            >
+              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
+              <span>Add Friend</span>
+            </div>
+          </div>
+
+          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
+            <span>Ayush Pandey</span>
+            <div
+              style="font-size: 14px; gap: 1rem; cursor: pointer"
+              class="flex-horizontal"
+            >
+              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
+              <span>Add Friend</span>
+            </div>
+          </div>
+
+          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
+            <span>Ayush Pandey</span>
+            <div
+              style="font-size: 14px; gap: 1rem; cursor: pointer"
+              class="flex-horizontal"
+            >
+              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
+              <span>Add Friend</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

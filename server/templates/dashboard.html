@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Photobook</title>
+    <script
+      src="https://kit.fontawesome.com/6e02521c5e.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <div class="split">
+      <div class="splitted">
+        <!-- ALBUMS -->
+        <div class="flex-horizontal">
+          <h2>Albums</h2>
+          <i class="fas fa-plus-circle" style="font-size: 30px"></i>
+        </div>
+
+        <div class="flex-horizontal">
+          <div class="gray-container p1">Album 1</div>
+          <div class="gray-container p1">Album 2</div>
+          <div class="gray-container p1">Album 3</div>
+        </div>
+
+        <br />
+        <br />
+        <br />
+
+        <!-- PHOTOS -->
+        <div class="flex-horizontal">
+          <h2>Photos</h2>
+          <i class="fas fa-plus-circle" style="font-size: 30px"></i>
+        </div>
+
+        <div class="flex-horizontal">
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+        </div>
+      </div>
+      <div class="splitted">
+        <div
+          class="flex-horizontal"
+          style="flex-wrap: nowrap; align-items: flex-start"
+        >
+          <div>
+            <h2>Popular Tags</h2>
+
+            <div class="gray-container flex-horizontal">
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+              <div class="blue-container">landscape</div>
+            </div>
+          </div>
+
+          <div style="min-width: 300px">
+            <h2>Top 10 Users</h2>
+            <div class="gray-container">
+              <ol type="1">
+                <li>User 1</li>
+                <li>User 2</li>
+                <li>User 3</li>
+                <li>User 4</li>
+                <li>User 5</li>
+                <li>User 6</li>
+                <li>User 7</li>
+                <li>User 8</li>
+                <li>User 9</li>
+                <li>User 10</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <br />
+        <br />
+        <br />
+
+        <!-- PHOTOS YOU MAY ALSO LIKE -->
+        <div class="flex-horizontal">
+          <h2>Photos you may also like</h2>
+          <i class="fas fa-plus-circle" style="font-size: 30px"></i>
+        </div>
+
+        <div class="flex-horizontal">
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Photobook</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="center">
+    <div class="gray-container">
+      <div class="form-content">
+        <div class="logo">photobook</div>
+        <input type="email" placeholder="Email" name="email" required />
+        <input
+          type="password"
+          placeholder="password"
+          name="password"
+          required
+        />
+
+        <button type="submit">Login</button>
+        <br />
+
+        <a href="/signup-page">Create an account</a>
+      </div>
+    </div>
+  </body>
+</html>

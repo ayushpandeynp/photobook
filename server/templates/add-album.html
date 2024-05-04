@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Album | Photobook</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div class="top-left-container">
+        <h3>Add Album</h3>
+        <input type="text" name="album-name" placeholder="Name of Album">
+        <br>
+        <br>
+        <button type="submit">Submit</button> 
+    </div>   
+  </body>
+</html>

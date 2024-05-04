@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | Photobook</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="center">
+    <div class="gray-container">
+      <div class="form-content">
+        <div class="logo">photobook</div>
+        <input type="fname" placeholder="First Name" name="fname" required />
+        <input type="lname" placeholder="Last Name" name="lname" required />
+        <input type="email" placeholder="Email" name="email" required />
+        <input type="dob" placeholder="DOB" name="dob"/>
+        <input type="hometown" placeholder="Hometown" name="hometown" required />
+        <input type="gender" placeholder="Gender" name="gender" required />
+        <input
+          type="password"
+          placeholder="Password"
+          name="password"
+          required
+        />
+
+        <button type="submit">Sign Up</button>
+        <br />
+
+        <a href="/login-page">Back to Login</a>
+      </div>
+    </div>
+  </body>
+</html>

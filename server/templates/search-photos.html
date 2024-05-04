@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Photos | Photobook</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+    <div class="p1">
+        <h3>Search Photos by Tag</h3>
+        <input type="text" name="search" placeholder=""  />
+        <button>Search</button>
+        <label class="switch">
+          <input type="checkbox" id="photos-owner-checker">
+          <span class="slider round"></span>
+        </label>
+        <p style="display:inline">Your Photos</p>
+        <br>
+        <br>
+        <div class="flex-horizontal">
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+          <div class="photo">
+            <div class="album">Birthday 2024</div>
+            <div class="user">@Ayush Pandey</div>
+            <img src="https://picsum.photos/200/200" class="thumbnail" />
+          </div>
+    </div>   
+    </div>   
+  </body>
+</html>

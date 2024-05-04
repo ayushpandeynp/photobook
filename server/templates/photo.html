@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo View | Photobook</title>
+    <script
+      src="https://kit.fontawesome.com/6e02521c5e.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'header.html' %}
+
+    <div
+      class="flex-horizontal"
+      style="padding: 2rem; gap: 4rem; align-items: flex-start"
+    >
+      <div>
+        <div class="photo" style="width: 500px; height: 500px">
+          <div class="album">Birthday 2024</div>
+          <div class="user">@Ayush Pandey</div>
+          <img src="https://picsum.photos/500/500" class="source" />
+        </div>
+
+        <br />
+        <i class="fas fa-thumbs-up" style="font-size: 20px; cursor: pointer"></i
+        >&nbsp;&nbsp;&nbsp;<span>24 Likes</span>
+
+        <br />
+        <br />
+        <h3>People who have liked</h3>
+        <div class="gray-container p1">
+          <ol type="1">
+            <li>ERIC ASARE</li>
+            <li>ERIC ASARE</li>
+            <li>ERIC ASARE</li>
+          </ol>
+        </div>
+      </div>
+
+      <div style="max-width: 600px">
+        <h2>Comments</h2>
+
+        <div class="gray-container p1 flex-vertical">
+          <span class="comment-author">Ayush Pandey</span>
+          <span class="comment-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
+            purus nec nunc tincidunt ultricies. Nullam nec purus nec nunc
+          </span>
+        </div>
+
+        <div class="gray-container p1 flex-vertical">
+          <span class="comment-author">Ayush Pandey</span>
+          <span class="comment-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
+            purus nec nunc tincidunt ultricies. Nullam nec purus nec nunc
+          </span>
+        </div>
+
+        <div class="gray-container p1 flex-vertical">
+          <span class="comment-author">Ayush Pandey</span>
+          <span class="comment-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
+            purus nec nunc tincidunt ultricies. Nullam nec purus nec nunc
+          </span>
+        </div>
+
+        <div class="gray-container p1 flex-vertical">
+          <span class="comment-author">Your Comment</span>
+          <div>
+            <textarea
+              name="comment"
+              id="comment"
+              cols="30"
+              rows="10"
+              style="width: 100%;"
+            ></textarea>
+
+            <br />
+            <br />
+
+            <button>Post Comment</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

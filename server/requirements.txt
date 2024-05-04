@@ -1,0 +1,5 @@
+Flask==2.0.3
+psycopg2==2.9.9
+flask_bcrypt==1.0.1
+pyjwt==2.8.0
+python-dotenv==1.0.0

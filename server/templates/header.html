@@ -1,0 +1,11 @@
+<div class="header">
+  <a href="/"><div class="logo">photobook</div></a>
+  <div class="navigation">
+    <a href="/friends-page"><button>Friends</button></a>
+    {% if user_id %}
+    <a href="/logout">Log out</a>
+    {% else %}
+    <a href="/login-page">Login</a>
+    {% endif %}
+  </div>
+</div>
