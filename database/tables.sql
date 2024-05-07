@@ -16,7 +16,7 @@ CREATE TABLE users (
     CONSTRAINT chk_visitor CHECK (
         (is_visitor AND fname IS NULL AND lname IS NULL AND email IS NULL AND dob IS NULL AND hometown IS NULL AND gender IS NULL AND password IS NULL)
         OR
-        (NOT is_visitor AND fname IS NOT NULL AND lname IS NOT NULL AND email IS NOT NULL AND dob IS NOT NULL AND hometown IS NOT NULL AND gender IS NOT NULL AND password IS NOT NULL)
+        (NOT is_visitor AND fname IS NOT NULL AND lname IS NOT NULL AND email IS NOT NULL AND hometown IS NOT NULL AND gender IS NOT NULL AND password IS NOT NULL)
     )
 );
 

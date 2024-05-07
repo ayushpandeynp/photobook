@@ -13,48 +13,101 @@
   <body>
     {% include 'header.html' %}
     <div class="p1">
-        <h3>Search Photos by Tag</h3>
-        <input type="text" name="search" placeholder=""  />
-        <button>Search</button>
-        <label class="switch">
-          <input type="checkbox" id="photos-owner-checker">
-          <span class="slider round"></span>
-        </label>
-        <p style="display:inline">Your Photos</p>
-        <br>
-        <br>
-        <div class="flex-horizontal">
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-    </div>   
-    </div>   
+      <h3>Search Photos by Tag</h3>
+      <input type="text" name="search" placeholder="" />
+      <button id="search_button">Search</button>
+
+      <label class="switch">
+        <input type="checkbox" id="photos-owner-checker" />
+        <span class="slider round"></span>
+      </label>
+      <p style="display: inline">Your Photos</p>
+      <br />
+      <br />
+
+      <div class="flex-horizontal" id="photo_list"></div>
+    </div>
+
+    <script>
+      const photos = document.getElementById("photo_list");
+      const submitButton = document.querySelector("#search_button");
+
+      submitButton.addEventListener("click", async () => {
+        photos.innerHTML = "";
+        const search_query = document.querySelector(
+          'input[name="search"]'
+        ).value;
+
+        // check if the user wants to search only their photos
+        const photosOwnerChecker = document.querySelector(
+          "#photos-owner-checker"
+        );
+        const onlyMyPhotos = photosOwnerChecker.checked;
+
+        if (onlyMyPhotos) {
+          const token = checkLogin();
+          axios
+            .get("/photos-with-tags-user", {
+              params: { tag: search_query },
+              headers: { Authorization: token },
+            })
+            .then((response) => {
+              if (response.data.success) {
+                response.data.data.photos.forEach((photo) => {
+                  const photoDiv = document.createElement("div");
+                  photoDiv.className = "photo";
+
+                  const albumDiv = document.createElement("div");
+                  albumDiv.className = "album";
+                  albumDiv.innerText = photo[3];
+
+                  const userDiv = document.createElement("div");
+                  userDiv.className = "user";
+                  userDiv.innerText = `@${photo[4]} ${photo[5]}`;
+
+                  const img = document.createElement("img");
+                  img.src = photo[2];
+                  img.className = "thumbnail";
+
+                  photoDiv.appendChild(albumDiv);
+                  photoDiv.appendChild(userDiv);
+                  photoDiv.appendChild(img);
+
+                  photos.appendChild(photoDiv);
+                });
+              }
+            });
+        } else {
+          axios
+            .get("/photos-with-tags-conjuctive", { params: { tag: search_query } })
+            .then((response) => {
+              if (response.data.success) {
+                response.data.data.photos.forEach((photo) => {
+                  const photoDiv = document.createElement("div");
+                  photoDiv.className = "photo";
+
+                  const albumDiv = document.createElement("div");
+                  albumDiv.className = "album";
+                  albumDiv.innerText = photo[3];
+
+                  const userDiv = document.createElement("div");
+                  userDiv.className = "user";
+                  userDiv.innerText = `@${photo[4]} ${photo[5]}`;
+
+                  const img = document.createElement("img");
+                  img.src = photo[2];
+                  img.className = "thumbnail";
+
+                  photoDiv.appendChild(albumDiv);
+                  photoDiv.appendChild(userDiv);
+                  photoDiv.appendChild(img);
+
+                  photos.appendChild(photoDiv);
+                });
+              }
+            });
+        }
+      });
+    </script>
   </body>
 </html>

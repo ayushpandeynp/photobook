@@ -18,6 +18,8 @@ def add_friend():
         cursor = conn.cursor()
         cursor.execute("INSERT into friends (user_id, friend_id) VALUES(%s, %s)",
                        (user_id,friend_id))
+        cursor.execute("INSERT into friends (user_id, friend_id) VALUES(%s, %s)",
+                       (friend_id,user_id))
         conn.commit()
         
         return returnMsg(True, 'Friend Added Successfully', 201)
@@ -30,7 +32,6 @@ def add_friend():
 # search for users by name (user scope)
 @app.route('/list-friends', methods=['GET'])
 def list_friends():
-    data = request.json
     user_id = decode_token(request)
     
     if user_id is None:
@@ -60,7 +61,7 @@ def list_friends():
 
     
 # search for users by name
-@app.route('/search-users', methods=['GET'])
+@app.route('/search-users', methods=['POST'])
 def search_friend():
     user_id = decode_token(request)
 
@@ -101,29 +102,28 @@ def friend_recommendation():
         """, (user_id,))
 
         user_friends = set(row[0] for row in cursor.fetchall())
-        
-        print(user_friends)
 
         # Step 2: recommend friends of friends
-        
-        # select all friends of friends of user A and count the number of times they appear
-        cursor.execute("""
-        SELECT u.user_id, u.lname, u.fname, u.email, COUNT(*) as appearance_count
-        FROM friends f
-        JOIN users u ON f.friend_id = u.user_id
-        WHERE f.user_id IN %s AND f.friend_id != %s
-        GROUP BY u.user_id, u.lname, u.fname, u.email
-        """, (tuple(user_friends), user_id))
+        recommendation = []
 
-        friends_of_friends = cursor.fetchall()
-        
-        # sort the friends by appearance count
-        friends_of_friends = sorted(friends_of_friends, key=lambda x: x[4], reverse=True)
-        
-        # Convert list of friends tuples to list of dictionaries
-        recommendation = [ 
-        {'user_id': user_id, 'fname': fname, 'lname': lname, 'email': email, 'appearance_count': count}
-            for user_id, fname, lname, email, count in friends_of_friends]
+        if (len(user_friends) > 0):
+            # select all friends of friends of user A and count the number of times they appear
+            cursor.execute("""
+            SELECT u.user_id, u.fname, u.lname, u.email, COUNT(*) as appearance_count
+            FROM friends f
+            JOIN users u ON f.friend_id = u.user_id
+            WHERE f.user_id IN %s AND f.friend_id != %s AND f.friend_id NOT IN (SELECT friend_id FROM friends WHERE user_id = %s)
+            GROUP BY u.user_id, u.lname, u.fname, u.email
+            """, (tuple(user_friends), user_id, user_id))
+            friends_of_friends = cursor.fetchall()
+            
+            # sort the friends by appearance count
+            friends_of_friends = sorted(friends_of_friends, key=lambda x: x[4], reverse=True)
+            
+            # Convert list of friends tuples to list of dictionaries
+            recommendation = [ 
+            {'user_id': user_id, 'fname': fname, 'lname': lname, 'email': email, 'appearance_count': count}
+                for user_id, fname, lname, email, count in friends_of_friends]
 
         cursor.close()
         

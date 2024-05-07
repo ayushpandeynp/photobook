@@ -5,36 +5,29 @@ from datetime import datetime, timedelta
 from backend.utils import *
 from app import app, conn, bcrypt
 
+
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
     hashed_password = bcrypt.generate_password_hash(
         data['password']).decode('utf-8')
+    
+    if not data['fname'] or not data['lname'] or not data['email'] or not data['hometown'] or not data['gender'] or not data['password']:
+        return returnMsg(False, 'All fields except DOB are required', 400)
 
     try:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (fname, lname, email, dob, hometown, gender, password, is_visitor) VALUES (%s, %s, %s, %s, %s, %s, %s, FALSE)",
-                       (data['fname'], data['lname'], data['email'], data['dob'], data['hometown'], data['gender'], hashed_password))
+        
+        if (data['dob']):
+            
+            cursor.execute("INSERT INTO users (fname, lname, email, dob, hometown, gender, password, is_visitor) VALUES (%s, %s, %s, %s, %s, %s, %s, FALSE)",
+                        (data['fname'], data['lname'], data['email'], data['dob'], data['hometown'], data['gender'], hashed_password))
+        else:
+            cursor.execute("INSERT INTO users (fname, lname, email, hometown, gender, password, is_visitor) VALUES (%s, %s, %s, %s, %s, %s, FALSE)",
+                        (data['fname'], data['lname'], data['email'], data['hometown'], data['gender'], hashed_password))
         conn.commit()
 
         return returnMsg(True, 'User created successfully', 201)
-    except psycopg2.Error as e:
-        conn.rollback()
-        return returnMsg(False, str(e), 400)
-
-
-@app.route('/visitor_signup', methods=['POST'])
-def visitor_signup():
-    try:
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO users (is_visitor) VALUES (TRUE)")
-        conn.commit()
-
-        user_id = cursor.fetchone()[0]
-
-        token = jwt.encode({'user_id': user_id, 'exp': datetime.utcnow() + timedelta(hours=24)},
-                           app.config['SECRET_KEY'], algorithm='HS256')
-        return returnMsg(True, 'Visitor created successfully', 201, {'token': token})
     except psycopg2.Error as e:
         conn.rollback()
         return returnMsg(False, str(e), 400)

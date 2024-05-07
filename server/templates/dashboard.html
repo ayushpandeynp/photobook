@@ -22,7 +22,9 @@
         <!-- ALBUMS -->
         <div class="flex-horizontal">
           <h2>Albums</h2>
-          <a href="/add-album-page"><i class="fas fa-plus-circle" style="font-size: 30px"></i></a>
+          <a href="/add-album-page"
+            ><i class="fas fa-plus-circle" style="font-size: 30px"></i
+          ></a>
         </div>
 
         <div class="flex-horizontal" id="albums_list"></div>
@@ -34,7 +36,9 @@
         <!-- PHOTOS -->
         <div class="flex-horizontal">
           <h2>Photos</h2>
-          <a href="/add-photo-page"><i class="fas fa-plus-circle" style="font-size: 30px"></i></a>
+          <a href="/add-photo-page"
+            ><i class="fas fa-plus-circle" style="font-size: 30px"></i
+          ></a>
         </div>
 
         <div class="flex-horizontal" id="photos_list"></div>
@@ -48,7 +52,9 @@
             <h2>Popular Tags</h2>
 
             <div class="gray-container flex-horizontal" id="tags_list"></div>
+            <a href="/search-photos-page"><button>Search Photos by Tags</button></a>
           </div>
+
 
           <div style="min-width: 300px">
             <h2>Top Contributors</h2>
@@ -97,6 +103,9 @@
           if (response.data.success) {
             response.data.data.photos.forEach((photo) => {
               const photoDiv = document.createElement("div");
+              photoDiv.onclick = () => {
+                window.location.href = `/photo-view?photo_id=${photo[0]}`;
+              };
               photoDiv.className = "photo";
 
               const albumDiv = document.createElement("div");
@@ -173,6 +182,9 @@
 
                 photos.forEach((photo) => {
                   const photoDiv = document.createElement("div");
+                  photoDiv.onclick = () => {
+                    window.location.href = `/photo-view?photo_id=${photo.photo_id}`;
+                  };
                   photoDiv.className = "photo";
 
                   const albumDiv = document.createElement("div");

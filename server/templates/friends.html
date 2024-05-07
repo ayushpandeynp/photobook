@@ -19,116 +19,344 @@
     <div style="padding: 2rem">
       <div
         class="flex-horizontal"
-        style="justify-content: flex-start; align-items: flex-start; gap: 5rem;"
+        style="justify-content: flex-start; align-items: flex-start; gap: 5rem"
       >
         <div>
           <h3>Search Friends</h3>
           <input type="text" placeholder="" name="friend-search" />
-          <button>Search</button>
+          <button class="search_friend">Search</button>
 
           <br />
           <br />
-
-          <h3>Results</h3>
-          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
-            <span>Ayush Pandey</span>
-            <div
-              style="font-size: 14px; gap: 1rem; cursor: pointer"
-              class="flex-horizontal"
-            >
-              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
-              <span>Add Friend</span>
-            </div>
-          </div>
-
-          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
-            <span>Ayush Pandey</span>
-            <div
-              style="font-size: 14px; gap: 1rem; cursor: pointer"
-              class="flex-horizontal"
-            >
-              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
-              <span>Add Friend</span>
-            </div>
-          </div>
-
-          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
-            <span>Ayush Pandey</span>
-            <div
-              style="font-size: 14px; gap: 1rem; cursor: pointer"
-              class="flex-horizontal"
-            >
-              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
-              <span>Add Friend</span>
-            </div>
+          <div class="search_friend_results">
+            <h3>Results</h3>
+            <div id="search_friend_list"></div>
           </div>
         </div>
-
         <div>
           <h3>Search Users by Comment</h3>
-          <input type="text" placeholder="" name="friend-search" />
-          <button>Search</button>
+          <input type="text" placeholder="" name="comment-search" />
+          <button class="search_comment">Search</button>
 
           <br />
           <br />
 
-          <h3>Results</h3>
-          <div class="gray-container p1">
-            ERIC ASARE ————— 5 Comments<br />
-            ERIC ASARE ————— 5 Comments<br />
-            ERIC ASARE ————— 5 Comments<br />
-            ERIC ASARE ————— 5 Comments
+          <div class="search_comment_results">
+            <h3>Results</h3>
+            <div id="search_comment_list" class="gray-container p1"></div>
           </div>
         </div>
 
         <div>
           <h3>Your Friends</h3>
           <div class="gray-container p1">
-            <ol type="1">
-              <li>ERIC ASARE</li>
-              <li>ERIC ASARE</li>
-              <li>ERIC ASARE</li>
-            </ol>
+            <ol type="1" id="my_friend_list"></ol>
           </div>
 
           <br />
           <br />
 
-          <h3>Recommended friends for you</h3>
-          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
-            <span>Ayush Pandey</span>
-            <div
-              style="font-size: 14px; gap: 1rem; cursor: pointer"
-              class="flex-horizontal"
-            >
-              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
-              <span>Add Friend</span>
-            </div>
-          </div>
-
-          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
-            <span>Ayush Pandey</span>
-            <div
-              style="font-size: 14px; gap: 1rem; cursor: pointer"
-              class="flex-horizontal"
-            >
-              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
-              <span>Add Friend</span>
-            </div>
-          </div>
-
-          <div class="gray-container p1 flex-horizontal" style="gap: 3rem">
-            <span>Ayush Pandey</span>
-            <div
-              style="font-size: 14px; gap: 1rem; cursor: pointer"
-              class="flex-horizontal"
-            >
-              <i class="fas fa-plus-circle" style="font-size: 18px"></i>
-              <span>Add Friend</span>
-            </div>
+          <div class="friend_recommendation_results">
+            <h3>Recommended Friends</h3>
+            <div id="recommended_friends_list" class="gray-container p1"></div>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      const token = loggedIn;
+      if (!token) {
+        alert("You need to login first");
+        window.location.href = "/login-page";
+      } else {
+        // LIST FRIENDS
+        axios
+          .get("/list-friends", {
+            headers: {
+              Authorization: token,
+            },
+          })
+          .then((response) => {
+            if (response.data.success) {
+              const friends_list = document.getElementById("my_friend_list");
+              friends_list.innerHTML = "";
+              response.data.data.friends.forEach((friend) => {
+                const friendLi = document.createElement("li");
+                friendLi.innerText = friend["fname"] + " " + friend["lname"];
+                friends_list.appendChild(friendLi);
+              });
+            }
+          })
+          .catch((err) => {
+            alert(err.response.data.message);
+          });
+
+        // SEARCH FRIENDS
+        const search_friend_input = document.querySelector(
+          "input[name=friend-search]"
+        );
+        const search_friend_button = document.querySelector(
+          "button.search_friend"
+        );
+
+        search_friend_button.addEventListener("click", () => {
+          const search_query = search_friend_input.value;
+          axios
+            .post(
+              "/search-users",
+              { name: search_query },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              }
+            )
+            .then((response) => {
+              if (response.data.success) {
+                const result_list =
+                  document.getElementById("search_friend_list");
+                const results_container = document.querySelector(
+                  ".search_friend_results"
+                );
+
+                result_list.innerHTML = "";
+                response.data.data.friends.forEach((friend) => {
+                  const friendDiv = document.createElement("div");
+                  friendDiv.className = "gray-container p1 flex-horizontal";
+                  friendDiv.style.gap = "3rem";
+
+                  const friendName = document.createElement("span");
+                  friendName.innerText = friend[1] + " " + friend[2];
+
+                  const addFriendDiv = document.createElement("div");
+                  addFriendDiv.className = "flex-horizontal";
+                  addFriendDiv.style.fontSize = "14px";
+                  addFriendDiv.style.gap = "1rem";
+                  addFriendDiv.style.cursor = "pointer";
+
+                  const addFriendIcon = document.createElement("i");
+                  addFriendIcon.className = "fas fa-plus-circle";
+                  addFriendIcon.style.fontSize = "18px";
+
+                  const addFriendText = document.createElement("span");
+                  addFriendText.innerText = "Add Friend";
+                  addFriendDiv.onclick = () => {
+                    axios
+                      .post(
+                        "/add-friend",
+                        { friend_id: friend[0] },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        }
+                      )
+                      .then((response) => {
+                        if (response.data.success) {
+                          alert("Friend added successfully");
+                          window.location.reload();
+                        } else {
+                          alert("Failed to add friend");
+                        }
+                      })
+                      .catch((err) => {
+                        alert(err.response.data.message);
+                      });
+                  };
+
+                  addFriendDiv.appendChild(addFriendIcon);
+                  addFriendDiv.appendChild(addFriendText);
+
+                  friendDiv.appendChild(friendName);
+                  friendDiv.appendChild(addFriendDiv);
+
+                  result_list.appendChild(friendDiv);
+                });
+
+                results_container.style.display = "block";
+              }
+            })
+            .catch((err) => {
+              alert(err.response.data.message);
+            });
+        });
+
+        // SEARCH USERS BY COMMENT
+        const search_comment_input = document.querySelector(
+          "input[name=comment-search]"
+        );
+        const search_comment_button = document.querySelector(
+          "button.search_comment"
+        );
+
+        search_comment_button.addEventListener("click", () => {
+          const search_query = search_comment_input.value;
+          axios
+            .post(
+              "/comment-search",
+              { comment: search_query },
+              {
+                headers: {
+                  Authorization: token,
+                },
+              }
+            )
+            .then((response) => {
+              if (response.data.success) {
+                const result_list = document.getElementById(
+                  "search_comment_list"
+                );
+                const results_container = document.querySelector(
+                  ".search_comment_results"
+                );
+
+                result_list.innerHTML = "";
+                response.data.data.comments.forEach((friend) => {
+                  const friendDiv = document.createElement("div");
+                  friendDiv.className = "gray-container p1 flex-horizontal";
+                  friendDiv.style.gap = "3rem";
+
+                  const friendName = document.createElement("span");
+                  friendName.innerText = friend[1] + " " + friend[2];
+
+                  // add new span to friendDiv
+                  const numCommentsSpan = document.createElement("span");
+                  numCommentsSpan.innerText = `Comments: ${friend[3]}`;
+                  friendDiv.appendChild(numCommentsSpan);
+
+                  const addFriendDiv = document.createElement("div");
+                  addFriendDiv.className = "flex-horizontal";
+                  addFriendDiv.style.fontSize = "14px";
+                  addFriendDiv.style.gap = "1rem";
+                  addFriendDiv.style.cursor = "pointer";
+
+                  const addFriendIcon = document.createElement("i");
+                  addFriendIcon.className = "fas fa-plus-circle";
+                  addFriendIcon.style.fontSize = "18px";
+
+                  const addFriendText = document.createElement("span");
+                  addFriendText.innerText = "Add Friend";
+                  addFriendDiv.onclick = () => {
+                    axios
+                      .post(
+                        "/add-friend",
+                        { friend_id: friend[0] },
+                        {
+                          headers: {
+                            Authorization: token,
+                          },
+                        }
+                      )
+                      .then((response) => {
+                        if (response.data.success) {
+                          alert("Friend added successfully");
+                          window.location.reload();
+                        } else {
+                          alert("Failed to add friend");
+                        }
+                      })
+                      .catch((err) => {
+                        alert(err.response.data.message);
+                      });
+                  };
+
+                  addFriendDiv.appendChild(addFriendIcon);
+                  addFriendDiv.appendChild(addFriendText);
+
+                  friendDiv.appendChild(friendName);
+                  friendDiv.appendChild(addFriendDiv);
+
+                  result_list.appendChild(friendDiv);
+                });
+
+                results_container.style.display = "block";
+              }
+            })
+            .catch((err) => {
+              alert(err.response.data.message);
+            });
+        });
+
+        // FRIEND RECOMMENDATION
+        axios
+          .get("friend-recommendation", {
+            headers: {
+              Authorization: token,
+            },
+          })
+          .then((response) => {
+            if (response.data.success) {
+              const result_list = document.getElementById(
+                "recommended_friends_list"
+              );
+              const results_container = document.querySelector(
+                ".friend_recommendation_results"
+              );
+
+              result_list.innerHTML = "";
+              response.data.data.recommendations.forEach((friend) => {
+                const friendDiv = document.createElement("div");
+                friendDiv.className = "gray-container p1 flex-horizontal";
+                friendDiv.style.gap = "3rem";
+
+                const friendName = document.createElement("span");
+                friendName.innerText = friend["fname"] + " " + friend["lname"];
+
+                const addFriendDiv = document.createElement("div");
+                addFriendDiv.className = "flex-horizontal";
+                addFriendDiv.style.fontSize = "14px";
+                addFriendDiv.style.gap = "1rem";
+                addFriendDiv.style.cursor = "pointer";
+
+                const addFriendIcon = document.createElement("i");
+                addFriendIcon.className = "fas fa-plus-circle";
+                addFriendIcon.style.fontSize = "18px";
+
+                const addFriendText = document.createElement("span");
+                addFriendText.innerText = "Add Friend";
+                addFriendDiv.onclick = () => {
+                  axios
+                    .post(
+                      "/add-friend",
+                      { friend_id: friend["user_id"] },
+                      {
+                        headers: {
+                          Authorization: token,
+                        },
+                      }
+                    )
+                    .then((response) => {
+                      if (response.data.success) {
+                        alert("Friend added successfully");
+                        window.location.reload();
+                      } else {
+                        alert("Failed to add friend");
+                      }
+                    })
+                    .catch((err) => {
+                      alert(err.response.data.message);
+                    });
+                };
+
+                addFriendDiv.appendChild(addFriendIcon);
+                addFriendDiv.appendChild(addFriendText);
+
+                friendDiv.appendChild(friendName);
+                friendDiv.appendChild(addFriendDiv);
+
+                result_list.appendChild(friendDiv);
+              });
+
+              if (result_list.children.length > 0) {
+                results_container.style.display = "block";
+              }
+            }
+          })
+          .catch((err) => {
+            alert(err.response.data.message);
+          });
+      }
+    </script>
   </body>
 </html>

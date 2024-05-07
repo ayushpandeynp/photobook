@@ -51,17 +51,7 @@
             const password = document.querySelector(
               'input[name="password"]'
             ).value;
-
-            console.log({
-              fname,
-              lname,
-              email,
-              dob,
-              hometown,
-              gender,
-              password,
-            });
-
+            
             axios
               .post("/signup", {
                 fname,

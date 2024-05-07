@@ -22,54 +22,41 @@
       style="padding: 2rem; gap: 4rem; align-items: flex-start"
     >
       <div>
+        <span
+          id="delete_photo"
+          style="color: rgb(255, 117, 117); cursor: pointer"
+          >Delete Photo</span
+        >
+
+        <br />
+        <br />
+        <br />
         <div class="photo" style="width: 500px; height: 500px">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/500/500" class="source" />
+          <div class="album"></div>
+          <div class="user"></div>
+          <img src="" class="source" />
         </div>
 
         <br />
+        <span id="caption"></span>
+        <br />
+        <br />
+        <br />
         <i class="fas fa-thumbs-up" style="font-size: 20px; cursor: pointer"></i
-        >&nbsp;&nbsp;&nbsp;<span>24 Likes</span>
+        >&nbsp;&nbsp;&nbsp;<span id="num_likes"></span>
 
         <br />
         <br />
         <h3>People who have liked</h3>
         <div class="gray-container p1">
-          <ol type="1">
-            <li>ERIC ASARE</li>
-            <li>ERIC ASARE</li>
-            <li>ERIC ASARE</li>
-          </ol>
+          <ol type="1" id="likes_list"></ol>
         </div>
       </div>
 
       <div style="max-width: 600px">
         <h2>Comments</h2>
 
-        <div class="gray-container p1 flex-vertical">
-          <span class="comment-author">Ayush Pandey</span>
-          <span class="comment-body">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
-            purus nec nunc tincidunt ultricies. Nullam nec purus nec nunc
-          </span>
-        </div>
-
-        <div class="gray-container p1 flex-vertical">
-          <span class="comment-author">Ayush Pandey</span>
-          <span class="comment-body">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
-            purus nec nunc tincidunt ultricies. Nullam nec purus nec nunc
-          </span>
-        </div>
-
-        <div class="gray-container p1 flex-vertical">
-          <span class="comment-author">Ayush Pandey</span>
-          <span class="comment-body">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec
-            purus nec nunc tincidunt ultricies. Nullam nec purus nec nunc
-          </span>
-        </div>
+        <div id="comment_list"></div>
 
         <div class="gray-container p1 flex-vertical">
           <span class="comment-author">Your Comment</span>
@@ -79,16 +66,194 @@
               id="comment"
               cols="30"
               rows="10"
-              style="width: 100%;"
+              style="width: 100%"
             ></textarea>
 
             <br />
             <br />
 
-            <button>Post Comment</button>
+            <button id="post">Post Comment</button>
           </div>
         </div>
       </div>
     </div>
+
+    <script>
+      // get photo_id from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const photo_id = urlParams.get("photo_id");
+
+      axios
+        .get("/get-photo", { params: { photo_id: photo_id } })
+        .then((response) => {
+          if (response.data.success) {
+            const photo = response.data.data.photo;
+
+            document.querySelector(".album").innerText = photo[3];
+            document.querySelector(
+              ".user"
+            ).innerText = `@${photo[4]} ${photo[5]}`;
+            document.querySelector(".source").src = photo[2];
+            document.getElementById("caption").innerHTML = photo[1];
+          }
+        });
+
+      // FETCH COMMENTS
+      axios
+        .get("/photo-comments", { params: { photo_id: photo_id } })
+        .then((response) => {
+          if (response.data.success) {
+            const comments = response.data.data.comments;
+            const commentsDiv = document.getElementById("comment_list");
+
+            comments.forEach((comment) => {
+              const commentDiv = document.createElement("div");
+              commentDiv.className = "gray-container p1 flex-vertical";
+              const commentAuthor = document.createElement("span");
+              commentAuthor.className = "comment-author";
+              commentAuthor.innerText =
+                comment[1] != null ? comment[1] + " " + comment[2] : "Visitor";
+              const commentBody = document.createElement("span");
+              commentBody.className = "comment-body";
+              commentBody.innerText = comment[3];
+              commentDiv.appendChild(commentAuthor);
+              commentDiv.appendChild(commentBody);
+              commentsDiv.appendChild(commentDiv);
+            });
+          }
+        });
+
+      // FETCH LIKES
+      axios
+        .get("/photo-likes", { params: { photo_id: photo_id } })
+        .then((response) => {
+          if (response.data.success) {
+            const likes = response.data.data.users;
+            const likesDiv = document.getElementById("likes_list");
+
+            const num_likes = document.getElementById("num_likes");
+            num_likes.innerText = likes.length + " Like" + (likes.length > 1 ? "s" : "");
+
+            let visitor_count = 0;
+            likes.forEach((like) => {
+              if (like[1] == null) {
+                visitor_count++;
+              } else {
+                const likeDiv = document.createElement("li");
+                likeDiv.innerText =
+                  like[1] != null ? like[1] + " " + like[2] : "Visitor";
+                likesDiv.appendChild(likeDiv);
+              }
+            });
+
+            if (visitor_count > 0) {
+              const visitorDiv = document.createElement("li");
+              visitorDiv.innerText = `No. of visitors: ${visitor_count}`;
+              likesDiv.appendChild(visitorDiv);
+            }
+          }
+        });
+
+      // ADD LIKE
+      const likeButton = document.querySelector(".fa-thumbs-up");
+      likeButton.addEventListener("click", () => {
+        const token = checkLogin();
+        axios
+          .post(
+            "/like-photo",
+            {
+              photo_id: photo_id,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.data.success) {
+              if (response.data.data.token) {
+                window.sessionStorage.setItem(
+                  "token",
+                  response.data.data.token
+                );
+              }
+              alert("Like added successfully");
+              window.location.reload();
+            }
+          })
+          .catch((err) => {
+            console.log(err.response.data.message);
+          });
+      });
+
+      // ADD COMMENT
+      const comment = document.getElementById("comment");
+      const postComment = document.getElementById("post");
+
+      postComment.addEventListener("click", () => {
+        const token = checkLogin();
+        axios
+          .post(
+            "/add-comment",
+            {
+              photo_id: photo_id,
+              comment: comment.value,
+            },
+            {
+              headers: {
+                Authorization: token,
+              },
+            }
+          )
+          .then((response) => {
+            if (response.data.success) {
+              if (response.data.data.token) {
+                window.sessionStorage.setItem(
+                  "token",
+                  response.data.data.token
+                );
+              }
+              alert("Comment added successfully");
+              window.location.reload();
+            }
+          })
+          .catch((err) => {
+            alert(err.response.data.message);
+          });
+      });
+
+      if (!loggedIn) {
+        document.getElementById("delete_photo").style.display = "none";
+      } else {
+        // DELETE PHOTO
+        const token = checkLogin();
+        document
+          .getElementById("delete_photo")
+          .addEventListener("click", () => {
+            const token = loggedIn;
+            axios
+              .delete("/delete-photo", {
+                headers: {
+                  Authorization: token,
+                },
+                data: {
+                  photo_id: photo_id,
+                },
+              })
+              .then((response) => {
+                if (response.data.success) {
+                  alert("Photo deleted successfully");
+                  window.location.replace("/");
+                } else {
+                  alert("Failed to delete photo");
+                }
+              })
+              .catch((err) => {
+                alert(err.response.data.message);
+              });
+          });
+      }
+    </script>
   </body>
 </html>

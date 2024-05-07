@@ -6,8 +6,6 @@ import os
 import uuid
 
 # list all photos (public)
-
-
 @app.route('/list-photos', methods=['GET'])
 def list_photos_public():
     try:
@@ -17,6 +15,61 @@ def list_photos_public():
         photos = cursor.fetchall()
 
         return returnMsg(True, 'Photos are returned', 200, {"photos": photos})
+    except psycopg2.Error as e:
+        conn.rollback()
+        return returnMsg(False, str(e), 400)
+
+# get by photo_id
+@app.route("/get-photo", methods=["GET"])
+def get_photo():
+    photo_id = request.args.get('photo_id')
+
+    if photo_id is None:
+        return returnMsg(False, 'Photo ID is required', 400)
+
+    try:
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT P.photo_id, P.caption, P.path, A.album_name, U.fname, U.lname FROM photos P INNER JOIN albums A ON P.album_id = A.album_id INNER JOIN users U ON A.user_id = U.user_id WHERE P.photo_id = %s", (photo_id,))
+        photo = cursor.fetchone()
+
+        if photo is None:
+            return returnMsg(False, 'Photo not found', 404)
+
+        return returnMsg(True, 'Photo is returned', 200, {"photo": photo})
+    except psycopg2.Error as e:
+        conn.rollback()
+        return returnMsg(False, str(e), 400)
+
+# delete photo
+@app.route('/delete-photo', methods=['DELETE'])
+def delete_photo():
+    data = request.json
+    user_id = decode_token(request)
+
+    if user_id is None:
+        return returnMsg(False, 'Unauthorized', 401)
+
+    try:
+        photo_id = data['photo_id']
+        if photo_id is None:
+            return returnMsg(False, 'Photo ID is required', 400)
+
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT user_id FROM albums WHERE album_id = (SELECT album_id FROM photos WHERE photo_id = %s)", (photo_id,))
+        album_user_id = cursor.fetchone()[0]
+
+        if album_user_id != user_id:
+            return returnMsg(False, 'Unauthorized to delete this photo', 401)
+
+        cursor.execute("DELETE FROM photos WHERE photo_id = %s", (photo_id,))
+        conn.commit()
+        cursor.close()
+
+        return returnMsg(True, 'Photo deleted successfully', 200)
+
     except psycopg2.Error as e:
         conn.rollback()
         return returnMsg(False, str(e), 400)
@@ -34,8 +87,6 @@ def upload_photo(file):
     return path
 
 # add a photo (user scope)
-
-
 @app.route('/add-photo', methods=['POST'])
 def add_photo():
     data = request.form
@@ -86,11 +137,10 @@ def add_photo():
         return returnMsg(False, str(e), 400)
 
 # list photos by tag name (public)
-
-
 @app.route('/photos-with-tags', methods=['GET'])
 def photos_with_tags_public():
     tag = request.args.get('tag')
+    tags = tag.split(' ')
 
     if tag is None:
         return returnMsg(False, 'Tag is required', 400)
@@ -100,7 +150,40 @@ def photos_with_tags_public():
 
         # with limit of 100 photos
         cursor.execute(
-            "SELECT P.photo_id, P.caption, P.path, A.album_name, U.fname, U.lname FROM photos P INNER JOIN albums A ON P.album_id = A.album_id INNER JOIN users U ON A.user_id = U.user_id WHERE photo_id IN (SELECT photo_id FROM tags WHERE tag_name = %s) LIMIT 100", (tag,))
+            "SELECT P.photo_id, P.caption, P.path, A.album_name, U.fname, U.lname FROM photos P INNER JOIN albums A ON P.album_id = A.album_id INNER JOIN users U ON A.user_id = U.user_id WHERE photo_id IN (SELECT photo_id FROM tags WHERE tag_name IN %s) LIMIT 100", (tuple(tags),))
+        photos = cursor.fetchall()
+
+        return returnMsg(True, 'Photos with tag are returned', 200, {"photos": photos})
+    except psycopg2.Error as e:
+        conn.rollback()
+        return returnMsg(False, str(e), 400)
+
+# conjuctive search (public)
+@app.route('/photos-with-tags-conjuctive', methods=['GET'])
+def photos_with_tags_public_conjuctive():
+    tag = request.args.get('tag')
+    tags = tag.split(' ')
+
+    if tag is None:
+        return returnMsg(False, 'Tag is required', 400)
+
+    try:
+        cursor = conn.cursor()
+
+        # with limit of 100 photos
+        cursor.execute(
+            """SELECT P.photo_id, P.caption, P.path, A.album_name, U.fname, U.lname
+                FROM photos P
+                INNER JOIN albums A ON P.album_id = A.album_id
+                INNER JOIN users U ON A.user_id = U.user_id
+                WHERE P.photo_id IN (
+                    SELECT photo_id
+                    FROM tags
+                    WHERE tag_name IN %s
+                    GROUP BY photo_id
+                    HAVING COUNT(DISTINCT tag_name) = %s
+                )
+                LIMIT 100""", (tuple(tags), len(set(tags))))
         photos = cursor.fetchall()
 
         return returnMsg(True, 'Photos with tag are returned', 200, {"photos": photos})
@@ -110,9 +193,10 @@ def photos_with_tags_public():
 
 
 # list photos by tag name (user scope)
-@app.route('/photos-with-tags-user', methods=['GET'])
+@ app.route('/photos-with-tags-user', methods=['GET'])
 def photos_with_tags_user():
-    tag = request.json['tag']
+    tag = request.args.get('tag')
+    tags = tag.split(' ')
     user_id = decode_token(request)
 
     if tag is None:
@@ -124,7 +208,21 @@ def photos_with_tags_user():
     try:
         cursor = conn.cursor()
 
-        cursor.execute("SELECT P.photo_id, P.caption, P.path, P.album_id FROM photos P INNER JOIN albums A ON A.album_id = P.album_id WHERE P.photo_id IN (SELECT photo_id FROM tags WHERE tag_name = %s) AND A.user_id = %s", (tag, user_id))
+        cursor.execute(
+            """SELECT P.photo_id, P.caption, P.path, A.album_name, U.fname, U.lname
+                FROM photos P
+                INNER JOIN albums A ON P.album_id = A.album_id
+                INNER JOIN users U ON A.user_id = U.user_id
+                WHERE P.photo_id IN (
+                    SELECT photo_id
+                    FROM tags
+                    WHERE tag_name IN %s
+                    GROUP BY photo_id
+                    HAVING COUNT(DISTINCT tag_name) = %s
+                )
+                AND A.user_id = %s
+                LIMIT 100""", (tuple(tags), len(set(tags)), user_id))
+
         photos = cursor.fetchall()
 
         return returnMsg(True, 'Photos with tag are returned', 200, {"photos": photos})
@@ -133,9 +231,7 @@ def photos_with_tags_user():
         return returnMsg(False, str(e), 400)
 
 # list 10 most popular tags (public)
-
-
-@app.route('/popular-tags', methods=['GET'])
+@ app.route('/popular-tags', methods=['GET'])
 def popular_tags():
     try:
         cursor = conn.cursor()
@@ -150,9 +246,7 @@ def popular_tags():
         return returnMsg(False, str(e), 400)
 
 # create an album (user scope)
-
-
-@app.route('/create-album', methods=['POST'])
+@ app.route('/create-album', methods=['POST'])
 def create_album():
     data = request.json
     user_id = decode_token(request)
@@ -178,9 +272,7 @@ def create_album():
         return returnMsg(False, str(e), 400)
 
 # list albums user-scope
-
-
-@app.route('/list-albums', methods=['GET'])
+@ app.route('/list-albums', methods=['GET'])
 def list_albums():
     user_id = decode_token(request)
     if user_id is None:
@@ -202,9 +294,7 @@ def list_albums():
         return returnMsg(False, str(e), 400)
 
 # list albums public scope
-
-
-@app.route('/list-albums-public', methods=['GET'])
+@ app.route('/list-albums-public', methods=['GET'])
 def list_albums_public():
     try:
         cursor = conn.cursor()
@@ -222,13 +312,10 @@ def list_albums_public():
         return returnMsg(False, str(e), 400)
 
 # List all photos, by album (public)
-
-
-@app.route('/list-photos-by-album', methods=['GET'])
+@ app.route('/list-photos-by-album', methods=['GET'])
 def list_photos_by_album():
     try:
         album_id = request.args.get('album_id')
-        print(album_id)
         if album_id is None:
             return returnMsg(False, 'Album is required', 400)
 
@@ -244,22 +331,27 @@ def list_photos_by_album():
         return returnMsg(False, str(e), 400)
 
 # Delete album (user scope)
-
-
-@app.route('/delete-album', methods=['DELETE'])
+@ app.route('/delete-album', methods=['DELETE'])
 def delete_album():
     data = request.json
     user_id = decode_token(request)
     if user_id is None:
         return returnMsg(False, 'Unauthorized', 401)
     try:
-        album_name = data['album_name']
-        if album_name is None:
-            return returnMsg(False, 'Album name is required', 400)
+        album_id = data['album_id']
+        if album_id is None:
+            return returnMsg(False, 'Album id is required', 400)
 
         cursor = conn.cursor()
         cursor.execute(
-            "DELETE FROM albums WHERE album_name = %s AND user_id = %s", (album_name, user_id))
+            "SELECT user_id FROM albums WHERE album_id = %s", (album_id,))
+        album_user_id = cursor.fetchone()[0]
+
+        if album_user_id != user_id:
+            return returnMsg(False, 'Unauthorized to delete this album', 401)
+
+        cursor.execute(
+            "DELETE FROM albums WHERE album_id = %s AND user_id = %s", (album_id, user_id))
         conn.commit()
         cursor.close()
 
@@ -271,12 +363,12 @@ def delete_album():
 
 
 # Top 10 users who make the largest contribution (comments + photos count) (public)
-@app.route('/top-contributors', methods=['GET'])
+@ app.route('/top-contributors', methods=['GET'])
 def top_contributors():
     try:
         cursor = conn.cursor()
 
-        cursor.execute("SELECT U.user_id, U.fname, U.lname, COUNT(P.photo_id) + COUNT(C.comment_id) AS contribution FROM users U LEFT JOIN albums A ON U.user_id = A.user_id LEFT JOIN photos P ON A.album_id = P.album_id LEFT JOIN comments C ON U.user_id = C.user_id GROUP BY U.user_id HAVING COUNT(P.photo_id) + COUNT(C.comment_id) > 0 ORDER BY contribution DESC LIMIT 10")
+        cursor.execute("SELECT U.user_id, U.fname, U.lname, COUNT(DISTINCT P.photo_id) + COUNT(DISTINCT C.comment_id) AS contribution FROM users U LEFT JOIN albums A ON U.user_id = A.user_id LEFT JOIN photos P ON A.album_id = P.album_id LEFT JOIN comments C ON U.user_id = C.user_id WHERE U.is_visitor = FALSE GROUP BY U.user_id HAVING COUNT(DISTINCT P.photo_id) + COUNT(DISTINCT C.comment_id) > 0 ORDER BY contribution DESC LIMIT 10")
         contributors = cursor.fetchall()
 
         return returnMsg(True, 'Top contributors are returned', 200, {"contributors": contributors})
@@ -285,9 +377,7 @@ def top_contributors():
         return returnMsg(False, str(e), 400)
 
 # You-may-also-like functionality (user scope)
-
-
-@app.route('/you-may-also-like', methods=['GET'])
+@ app.route('/you-may-also-like', methods=['GET'])
 def you_may_also_like():
     user_id = decode_token(request)
 
@@ -316,7 +406,9 @@ def you_may_also_like():
         if (len(user_tags) > 0):
             # get recommended photos
             cursor.execute("""
-                SELECT P.photo_id, P.caption, P.path, COUNT(T.tag_name) as matched_tags, A.album_name, U.fname, U.lname 
+                SELECT P.photo_id, P.caption, P.path,
+                    A.album_name, U.fname, U.lname,
+                    COUNT(DISTINCT T.tag_name) / NULLIF((SELECT COUNT(*) FROM tags WHERE photo_id = P.photo_id), 0) AS relevance_ratio
                 FROM photos P
                 INNER JOIN tags T ON P.photo_id = T.photo_id
                 INNER JOIN albums A ON P.album_id = A.album_id
@@ -324,7 +416,7 @@ def you_may_also_like():
                 WHERE T.tag_name IN %s
                 AND U.user_id != %s
                 GROUP BY P.photo_id, P.caption, P.path, A.album_name, U.fname, U.lname
-                ORDER BY matched_tags DESC
+                ORDER BY relevance_ratio DESC
                 LIMIT 10
             """, (tuple(user_tags),) + (user_id,))
 
