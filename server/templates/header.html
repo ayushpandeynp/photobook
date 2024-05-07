@@ -2,10 +2,22 @@
   <a href="/"><div class="logo">photobook</div></a>
   <div class="navigation">
     <a href="/friends-page"><button>Friends</button></a>
-    {% if user_id %}
-    <a href="/logout">Log out</a>
-    {% else %}
-    <a href="/login-page">Login</a>
-    {% endif %}
+
+    <div id="login_logout"></div>
+
+    <script src="{{ url_for('static', filename='js/check.js') }}"></script>
+
+    <script>
+      const loggedIn = checkLogin();
+      if (loggedIn) {
+        document.querySelector("#login_logout").innerHTML = `
+      <a href="/logout">Log out</a>
+    `;
+      } else {
+        document.querySelector("#login_logout").innerHTML = `
+      <a href="/login-page">Login</a>
+    `;
+      }
+    </script>
   </div>
 </div>

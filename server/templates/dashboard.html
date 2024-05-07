@@ -8,6 +8,7 @@
       src="https://kit.fontawesome.com/6e02521c5e.js"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
@@ -21,14 +22,10 @@
         <!-- ALBUMS -->
         <div class="flex-horizontal">
           <h2>Albums</h2>
-          <i class="fas fa-plus-circle" style="font-size: 30px"></i>
+          <a href="/add-album-page"><i class="fas fa-plus-circle" style="font-size: 30px"></i></a>
         </div>
 
-        <div class="flex-horizontal">
-          <div class="gray-container p1">Album 1</div>
-          <div class="gray-container p1">Album 2</div>
-          <div class="gray-container p1">Album 3</div>
-        </div>
+        <div class="flex-horizontal" id="albums_list"></div>
 
         <br />
         <br />
@@ -37,58 +34,10 @@
         <!-- PHOTOS -->
         <div class="flex-horizontal">
           <h2>Photos</h2>
-          <i class="fas fa-plus-circle" style="font-size: 30px"></i>
+          <a href="/add-photo-page"><i class="fas fa-plus-circle" style="font-size: 30px"></i></a>
         </div>
 
-        <div class="flex-horizontal">
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-        </div>
+        <div class="flex-horizontal" id="photos_list"></div>
       </div>
       <div class="splitted">
         <div
@@ -98,35 +47,13 @@
           <div>
             <h2>Popular Tags</h2>
 
-            <div class="gray-container flex-horizontal">
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-              <div class="blue-container">landscape</div>
-            </div>
+            <div class="gray-container flex-horizontal" id="tags_list"></div>
           </div>
 
           <div style="min-width: 300px">
-            <h2>Top 10 Users</h2>
+            <h2>Top Contributors</h2>
             <div class="gray-container">
-              <ol type="1">
-                <li>User 1</li>
-                <li>User 2</li>
-                <li>User 3</li>
-                <li>User 4</li>
-                <li>User 5</li>
-                <li>User 6</li>
-                <li>User 7</li>
-                <li>User 8</li>
-                <li>User 9</li>
-                <li>User 10</li>
-              </ol>
+              <ol type="1" id="top_users_list"></ol>
             </div>
           </div>
         </div>
@@ -136,44 +63,145 @@
         <br />
 
         <!-- PHOTOS YOU MAY ALSO LIKE -->
-        <div class="flex-horizontal">
+        <div class="flex-horizontal" id="you_may_like_title">
           <h2>Photos you may also like</h2>
-          <i class="fas fa-plus-circle" style="font-size: 30px"></i>
         </div>
 
-        <div class="flex-horizontal">
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-          <div class="photo">
-            <div class="album">Birthday 2024</div>
-            <div class="user">@Ayush Pandey</div>
-            <img src="https://picsum.photos/200/200" class="thumbnail" />
-          </div>
-        </div>
+        <div class="flex-horizontal" id="photos_you_may_like"></div>
       </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        /* ALBUMS */
+        const albums = document.getElementById("albums_list");
+        axios.get("/list-albums-public").then((response) => {
+          if (response.data.success) {
+            response.data.data.albums.forEach((album) => {
+              const albumDiv = document.createElement("div");
+              albumDiv.className = "gray-container p1";
+              albumDiv.innerText = album.album_name;
+              albumDiv.style.cursor = "pointer";
+              albumDiv.onclick = () => {
+                window.location.href = `/album-photos-page?album_id=${album.album_id}&album_name=${album.album_name}`;
+              };
+
+              albums.appendChild(albumDiv);
+            });
+          }
+        });
+
+        /* PHOTOS */
+        const photos = document.getElementById("photos_list");
+        axios.get("/list-photos").then((response) => {
+          if (response.data.success) {
+            response.data.data.photos.forEach((photo) => {
+              const photoDiv = document.createElement("div");
+              photoDiv.className = "photo";
+
+              const albumDiv = document.createElement("div");
+              albumDiv.className = "album";
+              albumDiv.innerText = photo[3];
+
+              const userDiv = document.createElement("div");
+              userDiv.className = "user";
+              userDiv.innerText = `@${photo[4]} ${photo[5]}`;
+
+              const img = document.createElement("img");
+              img.src = photo[2];
+              img.className = "thumbnail";
+
+              photoDiv.appendChild(albumDiv);
+              photoDiv.appendChild(userDiv);
+              photoDiv.appendChild(img);
+
+              photos.appendChild(photoDiv);
+            });
+          }
+        });
+
+        /* POPULAR TAGS */
+        const tags = document.getElementById("tags_list");
+        axios.get("/popular-tags").then((response) => {
+          if (response.data.success) {
+            response.data.data.tags.forEach((tag) => {
+              const tagDiv = document.createElement("div");
+              tagDiv.className = "blue-container";
+              tagDiv.innerText = tag[0];
+              tagDiv.style.cursor = "pointer";
+              tagDiv.onclick = () => {
+                window.location.href = `/tag-photos-page?tag=${tag[0]}`;
+              };
+
+              tags.appendChild(tagDiv);
+            });
+          }
+        });
+
+        /* TOP CONTRIBUTORS */
+        const topUsers = document.getElementById("top_users_list");
+        axios.get("/top-contributors").then((response) => {
+          if (response.data.success) {
+            response.data.data.contributors.forEach((user) => {
+              const userDiv = document.createElement("li");
+              userDiv.innerText = user[1] + " " + user[2];
+
+              topUsers.appendChild(userDiv);
+            });
+          }
+        });
+
+        if (loggedIn) {
+          const token = loggedIn;
+          /* PHOTOS YOU MAY LIKE */
+          const photosYouMayLike = document.getElementById(
+            "photos_you_may_like"
+          );
+          axios
+            .get("/you-may-also-like", {
+              headers: {
+                Authorization: token,
+              },
+            })
+            .then((response) => {
+              if (response.data.success) {
+                const photos = response.data.data.photos;
+                if (photos.length === 0) {
+                  document.getElementById("you_may_like_title").style.display =
+                    "none";
+                }
+
+                photos.forEach((photo) => {
+                  const photoDiv = document.createElement("div");
+                  photoDiv.className = "photo";
+
+                  const albumDiv = document.createElement("div");
+                  albumDiv.className = "album";
+                  albumDiv.innerText = photo.album_name;
+
+                  const userDiv = document.createElement("div");
+                  userDiv.className = "user";
+                  userDiv.innerText = `@${photo.fname} ${photo.lname}`;
+
+                  const img = document.createElement("img");
+                  img.src = photo.path;
+                  img.className = "thumbnail";
+
+                  photoDiv.appendChild(albumDiv);
+                  photoDiv.appendChild(userDiv);
+                  photoDiv.appendChild(img);
+
+                  photosYouMayLike.appendChild(photoDiv);
+                });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          document.getElementById("you_may_like_title").style.display = "none";
+        }
+      });
+    </script>
   </body>
 </html>

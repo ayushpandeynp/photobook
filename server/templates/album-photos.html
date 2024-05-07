@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>View Album Photos| Photobook</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
@@ -12,40 +13,49 @@
   <body>
     {% include 'header.html' %}
     <div class="p1">
-      <h3>Photos on Album - <span class="tag">Birthday 2024</span></h3>
+      <h3>Photos on Album - <span class="album"></span></h3>
 
-      <br>
-      <div class="flex-horizontal">
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
+      <br />
+      <div class="flex-horizontal" id="photo_list">
+      </div>
     </div>
+
+    <script>
+      const photos = document.getElementById("photo_list");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const album_id = urlParams.get("album_id");
+      const album_name = urlParams.get("album_name");
+      document.querySelector(".album").innerText = album_name;
+      
+      axios
+        .get("/list-photos-by-album", { params: { album_id: album_id } })
+        .then((response) => {
+          if (response.data.success) {
+            response.data.data.photos.forEach((photo) => {
+              const photoDiv = document.createElement("div");
+              photoDiv.className = "photo";
+
+              const albumDiv = document.createElement("div");
+              albumDiv.className = "album";
+              albumDiv.innerText = photo[3];
+
+              const userDiv = document.createElement("div");
+              userDiv.className = "user";
+              userDiv.innerText = `@${photo[4]} ${photo[5]}`;
+
+              const img = document.createElement("img");
+              img.src = photo[2];
+              img.className = "thumbnail";
+
+              photoDiv.appendChild(albumDiv);
+              photoDiv.appendChild(userDiv);
+              photoDiv.appendChild(img);
+
+              photos.appendChild(photoDiv);
+            });
+          }
+        });
+    </script>
   </body>
 </html>

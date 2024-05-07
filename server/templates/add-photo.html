@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Photo | Photobook</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
@@ -12,12 +13,91 @@
   <body>
     {% include 'header.html' %}
     <div class="top-left-container">
-        <h3>Add Photo</h3>
-        <input type="text" name="photo-file" placeholder="Choose a file to upload">
-        <br>
-        <br>
-        <button type="submit">Submit</button> 
-    </div>   
-    </div>   
+      <h3>Add Photo</h3>
+      <input
+        type="file"
+        name="photo-file"
+        placeholder="Choose a file to upload"
+      />
+      <br />
+      <br />
+      <textarea placeholder="Add a caption" name="caption" rows="10" cols="30"></textarea>
+      <br />
+      <br />
+      <input type="text" name="tags" placeholder="Tags (Comma-separated)" style="min-width: 250px;" />
+      <br />
+      <br />
+      Select Album &nbsp;&nbsp;&nbsp;
+      <select name="album"></select>
+      <br />
+      <br />
+      <br />
+      <br />
+      <button type="submit">Submit</button>
+    </div>
+
+    <script>
+      if (!loggedIn) {
+        alert("You need to login first");
+        window.location.replace("/login-page");
+      }
+
+      const inputFile = document.querySelector('input[type="file"]');
+      const submitButton = document.querySelector('button[type="submit"]');
+
+      const token = checkLogin();
+      const albums = document.querySelector("select");
+      axios
+        .get("/list-albums", {
+          headers: {
+            Authorization: token,
+          },
+        })
+        .then((response) => {
+          if (response.data.success) {
+            const responseAlbums = response.data.data.albums;
+            if (responseAlbums.length === 0) {
+              alert("No albums found. Please create an album first.");
+              window.location.replace("/add-album-page");
+            }
+
+            responseAlbums.forEach((album, i) => {
+              const albumDiv = document.createElement("option");
+              albumDiv.value = album.album_name;
+              albumDiv.innerText = album.album_name;
+              if (i === 0) {
+                albumDiv.selected = true;
+              }
+
+              albums.appendChild(albumDiv);
+            });
+          }
+        });
+
+      submitButton.addEventListener("click", async () => {
+        const formData = new FormData();
+        formData.append("photo", inputFile.files[0]);
+        formData.append("caption", document.querySelector("textarea").value);
+        formData.append("album", document.querySelector("select").value);
+        formData.append(
+          "tags",
+          document.querySelector('input[name="tags"]').value
+        );
+
+        try {
+          const response = await axios.post("/add-photo", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: token,
+            },
+          });
+
+          alert(response.data.message);
+          window.location.replace("/");
+        } catch (error) {
+          alert(error.response.data.message);
+        }
+      });
+    </script>
   </body>
 </html>

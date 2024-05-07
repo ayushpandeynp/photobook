@@ -8,6 +8,11 @@ from app import app, conn
 def login_page():
    return render_template('login.html')
 
+# logout page
+@app.route('/logout', methods=['GET'])
+def logout_page():
+   return render_template('logout.html')
+
 # signup page
 @app.route('/signup-page', methods=['GET'])
 def sign_page():

@@ -18,7 +18,7 @@ a {
   color: white;
 }
 
-input, tex {
+input, textarea {
   background-color: white;
   padding: 10px 20px;
   color: black;
@@ -166,7 +166,7 @@ button {
   position: absolute;
   width: 220px;
   height: 220px;
-  object-fit: fill;
+  object-fit: cover;
   cursor: pointer;
 }
 

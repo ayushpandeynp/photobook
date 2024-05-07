@@ -1,5 +1,5 @@
 -- Create Database
-CREATE DATABASE dbs_photobook;
+CREATE DATABASE photobook;
 
 -- Users Table
 CREATE TABLE users (

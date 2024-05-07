@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Album | Photobook</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
@@ -12,11 +13,45 @@
   <body>
     {% include 'header.html' %}
     <div class="top-left-container">
-        <h3>Add Album</h3>
-        <input type="text" name="album-name" placeholder="Name of Album">
-        <br>
-        <br>
-        <button type="submit">Submit</button> 
-    </div>   
+      <h3>Add Album</h3>
+      <input type="text" name="album-name" placeholder="Name of Album" />
+      <br />
+      <br />
+      <button type="submit">Submit</button>
+      <script>
+        if (!loggedIn) {
+          alert("You need to login first");
+          window.location.replace("/login-page");
+        }
+        
+        const submitButton = document.querySelector('button[type="submit"]');
+
+        submitButton.addEventListener("click", async () => {
+          const albumName = document.querySelector("input").value;
+
+          axios
+            .post(
+              "/create-album",
+              {
+                album_name: albumName,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `${window.sessionStorage.getItem("token")}`,
+                },
+              }
+            )
+            .then((response) => {
+              alert("Album created successfully");
+              window.location.href = "/";
+            })
+            .catch((error) => {
+              console.error(error);
+              alert(error.response.data.message);
+            });
+        });
+      </script>
+    </div>
   </body>
 </html>

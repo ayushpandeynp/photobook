@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign Up | Photobook</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body class="center">
     <div class="gray-container">
@@ -13,8 +17,13 @@
         <input type="fname" placeholder="First Name" name="fname" required />
         <input type="lname" placeholder="Last Name" name="lname" required />
         <input type="email" placeholder="Email" name="email" required />
-        <input type="dob" placeholder="DOB" name="dob"/>
-        <input type="hometown" placeholder="Hometown" name="hometown" required />
+        <input type="dob" placeholder="DOB" name="dob" />
+        <input
+          type="hometown"
+          placeholder="Hometown"
+          name="hometown"
+          required
+        />
         <input type="gender" placeholder="Gender" name="gender" required />
         <input
           type="password"
@@ -27,6 +36,52 @@
         <br />
 
         <a href="/login-page">Back to Login</a>
+        <script>
+          const signupButton = document.querySelector("button[type='submit']");
+
+          signupButton.addEventListener("click", async () => {
+            const fname = document.querySelector('input[name="fname"]').value;
+            const lname = document.querySelector('input[name="lname"]').value;
+            const email = document.querySelector('input[name="email"]').value;
+            const dob = document.querySelector('input[name="dob"]').value;
+            const hometown = document.querySelector(
+              'input[name="hometown"]'
+            ).value;
+            const gender = document.querySelector('input[name="gender"]').value;
+            const password = document.querySelector(
+              'input[name="password"]'
+            ).value;
+
+            console.log({
+              fname,
+              lname,
+              email,
+              dob,
+              hometown,
+              gender,
+              password,
+            });
+
+            axios
+              .post("/signup", {
+                fname,
+                lname,
+                email,
+                dob,
+                hometown,
+                gender,
+                password,
+              })
+              .then((response) => {
+                if (response.data.success) {
+                  window.location.href = "/login-page";
+                }
+              })
+              .catch((err) => {
+                alert(err.response.data.message);
+              });
+          });
+        </script>
       </div>
     </div>
   </body>

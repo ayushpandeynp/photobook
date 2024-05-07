@@ -8,44 +8,53 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   </head>
   <body>
     {% include 'header.html' %}
     <div class="p1">
-      <h3>Photos with tag <span class="tag">Landspace</span></h3>
+      <h3>Photos with tag - <span class="tag-name"></span></h3>
 
-      <br>
-      <div class="flex-horizontal">
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
-        <div class="photo">
-          <div class="album">Birthday 2024</div>
-          <div class="user">@Ayush Pandey</div>
-          <img src="https://picsum.photos/200/200" class="thumbnail" />
-        </div>
+      <br />
+      <div class="flex-horizontal" id="photo_list">
+      </div>
     </div>
+
+    <script>
+      const photos = document.getElementById("photo_list");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const tag = urlParams.get("tag");
+      document.querySelector(".tag-name").innerText = tag;
+
+      axios
+        .get("/photos-with-tags", { params: { tag: tag } })
+        .then((response) => {
+          if (response.data.success) {
+            response.data.data.photos.forEach((photo) => {
+              const photoDiv = document.createElement("div");
+              photoDiv.className = "photo";
+
+              const albumDiv = document.createElement("div");
+              albumDiv.className = "album";
+              albumDiv.innerText = photo[3];
+
+              const userDiv = document.createElement("div");
+              userDiv.className = "user";
+              userDiv.innerText = `@${photo[4]} ${photo[5]}`;
+
+              const img = document.createElement("img");
+              img.src = photo[2];
+              img.className = "thumbnail";
+
+              photoDiv.appendChild(albumDiv);
+              photoDiv.appendChild(userDiv);
+              photoDiv.appendChild(img);
+
+              photos.appendChild(photoDiv);
+            });
+          }
+        });
+    </script>
   </body>
 </html>
